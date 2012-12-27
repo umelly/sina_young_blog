@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block container %}
+  <div class="row">
+    <div class="span9">
+    
+        {% if blogs %}
+        {% for blog in blogs %}
+        
+        <section style="margin-bottom:50px;">
+        <h3><a href="{% url show_blog blog.id %}">{{ blog.title }}</a></h3>
+        <p style="border-bottom:1px solid #ddd;padding-bottom:5px;"><span>{{ blog.uptime }}</span>
+        | 标签:
+        {% for tag in blog.tags.select_related %}
+        <a href="/blog/tags/{{ tag.name }}" class="btn btn-mini btn-info">{{ tag.name }}
+        </a>
+        {% if forloop.last %}{% else %},{% endif %}
+        {% endfor %}
+        | 分类:<code>{{ blog.category.name }}</code>
+        </p>
+        {{ blog.content|safe }}
+        <p style="text-align:right;">
+        <span>
+            <!-- <a class="btn btn-link btn-small">Views:(11)</a> -->
+            <a class="btn btn-primary btn-mini disabled">评论: ( {{ blog.get_comment_nums }} )</a>
+        </span>
+        </p>
+        </section>
+        
+        {% endfor %}
+        {% else %}
+        <div class="hero-unit" style="margin-top:20px;">
+            <h2>博主删了文章去火星避难去了 Opps~~</h2>
+            <a class="btn btn-info" href="/server">去火星追踪 »</a>
+        </div>
+        {% endif %}
+    </div>
+    {% include 'right_content.html' %}
+  </div>
+{% endblock %}

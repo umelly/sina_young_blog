@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block container %}
+  <div class="row">
+    <div class="span9">
+    
+        {% if blog %}
+        <section style="margin-bottom:20px;">
+        <h3><a href="javascript:void(0);">{{ blog.title }}</a></h3>
+        <p style="border-bottom:1px solid #ddd;padding-bottom:5px;"><span>{{ blog.uptime }}</span>
+        | 标签:
+        {% for tag in blog.tags.select_related %}
+        <a href="/blog/tags/{{ tag.name }}" class="btn btn-mini btn-info">{{ tag.name }}
+        </a>
+        {% if forloop.last %}{% else %},{% endif %}
+        {% endfor %}
+        | 分类:<code>{{ blog.category.name }}</code>
+        </p>
+        {{ blog.content|safe }}
+        </section>
+        <p style="width:100%;float:left;">
+        
+          {% if blog.pre_one %}
+          <span class="pull-left" style="margin-left:30px;">
+            <a href="/blog/{{ blog.pre_one.id }}">
+            <i class="icon-arrow-left"></i>{{ blog.pre_one.title }}
+            </a>
+          </span>
+          {% endif %}
+          
+          {% if blog.later_one %}
+          <span class="pull-right"  style="margin-right:30px;">
+          <a href="/blog/{{ blog.later_one.id }}">
+            {{ blog.later_one.title }}<i class="icon-arrow-right"></i>
+          </a>
+          </span>
+          {% endif %}
+        </p>
+        <div style="clear:both;"></div>
+        <table class="table well" id="comment_table">
+          <thead>
+            <tr>
+              <th colspan="3">评论</th>
+            </tr>
+          </thead>
+          <tbody id="comment_tbody">
+            {% if comments %}
+            {% for comment in comments %}
+            <tr id="comment_tr_{{ comment.id }}">
+              <td width="20px">
+                <span class="badge badge-info">{{ forloop.counter }}</span>
+              </td>
+              <td> 
+                <span style="color:blue;font-weight:bold;">{{ comment.name }}</span> Post at:
+                <code>{{ comment.instime }}</code>
+              </td>
+              <td width="30px;">
+                <a href="javascript:void(0)" onclick="quote({{forloop.counter}}, '{{comment.name}}', {{comment.id}});">引用</a>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="3" style="border-top:none;">
+                <div style="padding-bottom:16px;padding-left:10px;">
+                  {{ comment.content|safe }}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr id="commemt_null_td">
+              <td colspan="3">
+                <div style="padding-bottom:16px;padding-left:10px;">
+                  暂无评论！
+                </div>
+              </td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+        
+        <form class="form-horizontal" id="comment_form">
+          <div class="control-group">
+            <label class="control-label" style="width:70px;">姓名</label>
+            <div class="controls" style="margin-left:90px;">
+              <input type="text" id="id_name" placeholder="your name">
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" style="width:70px;">Email</label>
+            <div class="controls" style="margin-left:90px;">
+              <input type="text" id="id_email" placeholder="email address">
+              <span style="font-size:12px;" class="label label-info">可选项<span>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" style="width:70px;"></label>
+            <div class="controls" style="margin-left:90px;">
+              <p id="quote_p" style="display:none;">引用来自<code id="quote_code"></code>的发言
+                <a href="javascript:void(0);" onclick="cancelQuote();"><i class="icon-remove"></i></a>
+              </p>
+              <textarea id="id_content" style="width:440px;height:120px;"></textarea>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="controls" style="margin-left:90px;">
+              <input type="hidden" name="quote_comment" value="" id="quote_comment"/>
+              <input type="button" class="btn btn-primary" value="提交" id="post_comment_btn">
+            </div>
+          </div>
+        </form>
+        
+        {% else %}
+        <div class="hero-unit" style="margin-top:20px;">
+            <h2>博主删了文章去火星避难去了 Opps~~</h2>
+            <a class="btn btn-info" href="/server">去火星追踪 »</a>
+        </div>
+        {% endif %}
+    </div>
+    {% include 'right_content.html' %}
+  </div>
+<script type="text/javascript">
+$("#post_comment_btn").click(function(){
+
+    var comment_user = $.trim($("#id_name").val());
+    var comment_email = $.trim($("#id_email").val());
+    var comment_content = $.trim($("#id_content").val());
+    var comment_tbody = $("#comment_tbody");
+    var comment_quote = $("#quote_comment").val();
+
+    var email_reg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+
+    if(comment_user==''){
+      alert('请填写名字.');
+      $("#id_name").focus();
+      return false;
+    }
+
+    if(comment_email!='' && !email_reg.test(comment_email)){
+      alert('请填写正确的Email.');
+      $("#id_email").focus();
+      return false;
+    }
+
+    if(comment_content==''){
+      alert('请填写评论内容.');
+      $("#id_content").focus();
+      return false;
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "{% url post_comment %}",
+        data: {
+          "blog_id": {{ blog.id }}, 
+          "user": comment_user,
+          "email": comment_email,
+          "quote": comment_quote,
+          "csrfmiddlewaretoken": "{{ csrf_token }}",
+          "content": comment_content },
+        timeout: 2000,
+        success: function(msg){
+          location.reload();
+        },
+        error: function(msg){
+          
+        }
+    });
+});
+function quote(lv, name, comment_id){
+  $("#quote_comment").val(lv+"###"+name+"###"+comment_id);
+  $("#id_content").focus();
+  $("#quote_code").html(lv+"楼-"+name);
+  $("#quote_p").fadeIn();
+}
+function cancelQuote(){
+  $("#quote_comment").val('');
+  $("#quote_p").fadeOut();
+  return false;
+}
+</script>
+{% endblock %}

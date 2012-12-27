@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block js %}
+<script type="text/javascript" src="http://images.wauee.com/zmv5/js/lhgdialog/lhgdialog.min.js"></script>
+{% endblock %}
+
+
+{% block container %}
+
+<div class="page-header" style="margin-top:100px;">
+    <h3 style="font-size:18px;">发表文章</h3>
+</div>
+
+    {% if form.errors %}
+    <div class="alert alert-error">
+      {{ form.errors }}  
+    </div>
+    {% endif %}
+
+  <div class="row">
+    <form class="form-horizontal" method="post" action="">
+      <div class="control-group">
+        <label class="control-label">
+            {{ form.title.label }}
+        </label>
+        <div class="controls">
+          {{ form.title }}
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">
+            {{ form.category.label }}
+        </label>
+        <div class="controls">
+          {{ form.category }}
+          <a href="/post_category" class="btn btn-link tbox" title="添加分类" onclick="return showDialog(this);" w="360" h="140">添加</a>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">
+            {{ form.tags.label }}
+        </label>
+        <div class="controls">
+          {{ form.tags }}
+        </div>
+      </div>
+      
+      <div class="control-group">
+        <label class="control-label" for="inputPassword"></label>
+        <div class="controls">
+            {{ form.content }}
+        </div>
+      </div>
+    
+    <div class="form-actions">
+        {% csrf_token %}
+      <button type="submit" class="btn btn-primary">提交</button>
+      <button type="button" class="btn">Cancel</button>
+    </div>
+    </form>
+  </div>
+
+<link href="http://a.tbcdn.cn/s/kissy/1.2.0/css/base-min.css" rel="stylesheet"/>
+<link href="http://a.tbcdn.cn/s/kissy/1.2.0/editor/theme/cool/editor-pkg-min-datauri.css" rel="stylesheet"/>
+<script src="http://a.tbcdn.cn/s/kissy/1.2.0/??kissy-min.js,uibase-min.js,component-min.js,dd-min.js,overlay-min.js,editor-min.js"></script>
+<script src="http://a.tbcdn.cn/s/kissy/1.2.0/editor/biz/ext/editor-plugin-pkg-min.js"></script>
+<script type="text/javascript">
+KISSY.ready(function (S) {
+
+    S.use('editor', function () {
+
+        var KE = KISSY.Editor;
+        var cfg = {
+            attachForm:true,
+            baseZIndex:10000,
+            //自定义样式
+            //customStyle:"p{color:purple;}",
+            //自定义外部样式
+            //customLink:["http://localhost/customLink.css","http://xx.com/y2.css"],
+            //是否一开始自动聚焦
+            //focus:true,
+            pluginConfig:{
+                "image":{
+                    upload:{
+                        serverUrl:"/image_upload",
+                        surfix:"png,jpg,jpeg,gif",
+                        fileInput:"Filedata",
+                        sizeLimit:1000
+                    }
+                },
+                "resize":{
+                    direction:["y"]
+                }
+            }
+        };
+        var editor = KE("#id_content", S.clone(cfg)).use("elementpaths," +
+            "sourcearea,preview," +
+            "font,color,separator," +
+            "justify,separator,link," +
+            "image," +
+            "smiley,separator,resize," +
+            "separator,maximize");
+    });
+});
+</script>
+{% endblock %}

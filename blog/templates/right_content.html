@@ -1,0 +1,53 @@
+<div class="span3">
+      <section>
+        <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=2&isTitle=0&noborder=1&isWeibo=1&isFans=0&uid=1684547443&verifier=e30813de&dpc=1"></iframe>
+      </section>
+    
+      <section>
+      <h5><i class="icon-comment"></i>&nbsp;最近评论</h5>
+      <ul style="list-style:none;margin-left:3px;margin-bottom:0px;font-size:13px;">
+      {% if recent_comments %}
+      {% for comment in recent_comments %}
+        <li>
+          <a href="/blog/{{ comment.article.id }}#comment_tr_{{ comment.id }}">{{ comment.name }}:</a>
+          <span>{{ comment.content|truncatechars:20 }}</span>
+        </li>
+      {% endfor %}
+      {% else %}
+        <li>
+          <span>暂无评论~</span>
+        </li>
+      {% endif %}
+      </ul>
+      </section>
+      
+      <section style="font-size:13px;">
+        <h5><i class="icon-leaf"></i>&nbsp;随机阅读</h5>
+      <ul style="list-style:none;margin-left:3px;margin-bottom:0px;font-size:13px;">
+        {% if random_blog %}
+        {% for art in random_blog %}
+        <li>
+          <a href="/blog/{{ art.id }}">{{ art.title|truncatechars:20 }}</a>
+        </li>
+        {% endfor %}
+        {% else %}
+        <li>
+          <span>暂无博文~</span>
+        </li>
+        {% endif %}
+      </ul>
+      </section>
+      
+      <section>
+      <h5><i class="icon-tags"></i>&nbsp;标签云</h5>
+      <div>
+        {% if tags_clouds %}
+        {% for tag_name, tag_count in tags_clouds.iteritems %}
+        <a href="/blog/tags/{{ tag_name }}" class="badge badge-info" style="font-weight:normal;font-size:{{ tag_count }}em;">{{ tag_name }}</a>
+        {% endfor %}
+        {% else %}
+        暂无可显示标签~
+        {% endif %}
+        </div>
+      </section>
+    </div>

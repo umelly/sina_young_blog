@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}-Young-{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="python">
+    <meta name="author" content="hef">
+
+    <script src="http://images.wauee.com/tzunion/js/jquery-1.8.0.min.js"></script>
+
+    <!-- Le styles -->
+    <link href="http://images.wauee.com/bootstrap/2.21/css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 70px;
+        background-color: #fefefe;
+      }
+      section > h5{
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 5px;
+      }
+      .form-signin {
+        max-width: 300px;
+        padding: 19px 29px 29px;
+        margin: 0 auto 20px;
+        background-color: #fff;
+        border: 1px solid #e5e5e5;
+        -webkit-border-radius: 5px;
+           -moz-border-radius: 5px;
+                border-radius: 5px;
+        -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+           -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+                box-shadow: 0 1px 2px rgba(0,0,0,.05);
+      }
+      .form-signin .form-signin-heading,
+      .form-signin .checkbox {
+        margin-bottom: 10px;
+      }
+      .form-signin input[type="text"],
+      .form-signin input[type="password"] {
+        font-size: 16px;
+        height: auto;
+        margin-bottom: 15px;
+        padding: 7px 9px;
+      }
+      .footer {
+          background-color: #E5E5E5;
+          border-top: 1px solid #E5E5E5;
+          margin-top: 70px;
+          padding: 20px 0px 0px 0px;
+      }
+      .footer-links {
+          margin: 10px 0;
+      }
+      .footer-links li:first-child {
+          padding-left: 0;
+      }
+      .footer-links li {
+          display: inline;
+          padding: 0 2px;
+      }
+    </style>
+    <link href="http://images.wauee.com/bootstrap/2.21/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    {% block js %}{% endblock %}
+    {% block css %}{% endblock %}
+  </head>
+
+  <body>
+    
+  <!-- Navbar
+  ================================================== -->
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="/" id="title"></a>
+        <div class="nav-collapse collapse">
+          <!--           
+          <form class="navbar-form pull-right">
+          <input type="text" class="span2">
+          <button type="submit" class="btn btn-info">丢</button>
+          </form> 
+          -->
+          <ul class="nav pull-right">
+            <li class="">
+              <a href="/">Home</a>
+            </li>
+            <li class="">
+              <a href="/about">About</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% block head %}{% endblock %}
+  <div class="container">
+  {% block container %}
+  <div class="row">
+    <div class="span9">
+      <h3>Multiple button groups</h3>
+      <p>Combine sets of <code>&lt;div class="btn-group"&gt;</code> into a <code>&lt;div class="btn-toolbar"&gt;</code> for more complex components.</p>
+      <div class="entry">
+        <p>周末看到那些排队血拼的人们，不用走进 shopping mall、不用看到那些五颜六色的打折和视觉冲击就能感受到 “节日要到了！”。一年又快结束了，这周完成备份、升级之类的收尾工作，接下来就是6周的假期，没啥大安排，假期第1周去南非德班参加高性能计算会议，回来后和家人短途旅行，然后圣诞节在家休息学点新东西，比如修车什么的，几次痛苦经历告诉我出来玩迟早是要坏的，对于 hiking/camping/road trip/4×4 这几个关键字的爱好者来说懂点维修常识是必须的。废话留到假期再说吧，<font color="blue">接下来六周可能没有技术方面的博客更新</font>～</p>
+<p>最近对 LDAP 服务器上面的数据做处理，有机会接触了一下 <a href="http://www.python-ldap.org">Python-LDAP</a> 这个库和 LDAP/Kerberos. 去除所有打印和错误处理的代码后，用 Python-LDAP 操作 LDAP 的骨干代码其实很简单，就这么几行，唯一遇到的一个小麻烦就是折腾了一个多小时才知道 ‘TRUE’ 要大写（后面有说到）。</p>
+<h4>安装 Python-LDAP</h4>
+<p>在 Ubuntu/Debian 下安装 python-ldap 模块：</p>
+<pre class="code">$ sudo apt-get install python-ldap
+</pre>
+<p>在 CentOS/RHEL 下安装 python-ldap 模块：</p>
+<pre class="code"># yum install python-ldap
+</pre>
+<h4>创建</h4>
+<p>创建一条 LDAP 新纪录。有个要注意的地方，我们的 LDAP 有个属性 active，用来判断用户帐号是否是激活的 attrs['active'] = ‘TRUE’，这里的 ‘TRUE’ 不能用小写的 ‘true’，刚开始被 LDAP 管理工具上的小写 ‘true’ 误导，老以为 Python 程序里也应该用小写，结果总报错。</p>
+<pre class="code">def ldap_add(firstname, lastname, username):
+    l = ldap.open(LDAP_HOST)
+    l.protocol_version = ldap.VERSION3
+    l.simple_bind(LDAP_BIND, LDAP_PASS)
+
+    cn = firstname + ' ' + lastname
+    addDN = "cn=%s,ou=People,dc=vpsee,dc=com" % cn
+    attrs = {}
+    attrs['objectclass'] = ['top','person','inetOrgPerson','posixAccount','vpseeAccount']
+    attrs['cn'] = cn
+    attrs['givenName'] = firstname
+    attrs['homeDirectory'] = '/home/people/%s' % username
+    attrs['loginShell'] = '/bin/bash'
+    attrs['sn'] = lastname
+    attrs['uid'] = username
+    attrs['uidNumber'] = ldap_newuid()
+    attrs['gidNumber'] = ldap_getgid()
+    attrs['active'] = 'TRUE'
+    ldif = modlist.addModlist(attrs)
+    l.add_s(addDN, ldif)
+    l.unbind_s()
+</pre>
+      </div>
+      
+    </div>
+    <div class="span3">
+      <section>
+        <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=2&isTitle=0&noborder=1&isWeibo=1&isFans=0&uid=1684547443&verifier=e30813de&dpc=1"></iframe>
+      </section>
+    
+      <section>
+      <h5><i class="icon-comment"></i>&nbsp;最近评论</h5>
+      <ul style="list-style:none;margin-left:3px;margin-bottom:0px;font-size:13px;">
+        <li>
+          <a href="/">飞雨果壳:</a>
+          <span>昨天看到一个卖切糕的假货, 我上前就是一跪！！！</span>
+        </li>
+        <li>
+          <a href="/">贱人曾:</a>
+          <span>说好的一起呢。。</span>
+        </li>        
+        <li>
+          <a href="/">如果爱:</a>
+          <span>太坑了，不玩了！</span>
+        </li>
+      </ul>
+      </section>
+      
+      <section style="font-size:13px;">
+        <h5><i class="icon-leaf"></i>&nbsp;随机阅读</h5>
+      <ul style="list-style:none;margin-left:3px;margin-bottom:0px;font-size:13px;">
+        <li>
+          <a href="/">怎样成为一名合格的糕富帅.</a>
+        </li>
+        <li>
+          <a href="/">怎样成为一名合格的糕富帅.</a>
+        </li>        <li>
+          <a href="/">怎样成为一名合格的糕富帅xxx.</a>
+        </li>
+      </ul>
+      </section>
+      
+      <section>
+      <h5><i class="icon-tags"></i>&nbsp;标签云</h5>
+      <div class="tagscloud" id="tagscloud">
+        <a href="/articles/tags/web.py/" style="color:blue;font-size:12px;">web.py</a>
+        <a href="/articles/tags/zookeeper/" style="color:green;font-size:12px;">zookeeper</a>
+        <a href="/articles/tags/面包旅行/" style="color:red;font-size:12px;">面包旅行</a>
+        <a href="/articles/tags/新生/" style="color:green;font-size:12px;">新生</a>
+        <a href="/articles/tags/中秋/" style="color:blue;font-size:12px;">中秋</a>
+        <a href="/articles/tags/vim/" style="color:purple;font-size:12px;">vim</a>
+        <a href="/articles/tags/程序员/" style="color:red;font-size:12px;">程序员</a>
+        <a href="/articles/tags/FC/" style="color:green;font-size:12px;">FC</a>
+        <a href="/articles/tags/warcraft/" style="color:red;font-size:12px;">warcraft</a>
+        <a href="/articles/tags/好吃的/" style="color:purple;font-size:14px;">好吃的</a>
+        <a href="/articles/tags/好玩/" style="color:purple;font-size:12px;">好玩</a>
+        <a href="/articles/tags/蛋疼/" style="color:red;font-size:12px;">蛋疼</a>
+        <a href="/articles/tags/mako/" style="color:purple;font-size:12px;">mako</a>
+        <a href="/articles/tags/梦/" style="color:red;font-size:12px;">梦</a>
+        <a href="/articles/tags/北京/" style="color:green;font-size:12px;">北京</a>
+        <a href="/articles/tags/twisted/" style="color:green;font-size:14px;">twisted</a>
+        <a href="/articles/tags/blog/" style="color:red;font-size:12px;">blog</a>
+        <a href="/articles/tags/欢乐/" style="color:blue;font-size:12px;">欢乐</a>
+        <a href="/articles/tags/旅游/" style="color:purple;font-size:12px;">旅游</a>
+        <a href="/articles/tags/verycd/" style="color:blue;font-size:12px;">verycd</a>
+        <a href="/articles/tags/海洋工地/" style="color:blue;font-size:12px;">海洋工地</a>
+        <a href="/articles/tags/xbox/" style="color:red;font-size:16px;">xbox</a>
+        <a href="/articles/tags/zhikanlz/" style="color:red;font-size:12px;">zhikanlz</a>
+        <a href="/articles/tags/svn/" style="color:red;font-size:12px;">svn</a>
+        <a href="/articles/tags/javascript/" style="color:green;font-size:12px;">javascript</a>
+        <a href="/articles/tags/流水帐/" style="color:purple;font-size:12px;">流水帐</a>
+        <a href="/articles/tags/python/" style="color:green;font-size:30px;">python</a>
+        <a href="/articles/tags/音乐/" style="color:red;font-size:12px;">音乐</a>
+        <a href="/articles/tags/学习/" style="color:blue;font-size:12px;">学习</a>
+        <a href="/articles/tags/香山/" style="color:purple;font-size:12px;">香山</a>
+        <a href="/articles/tags/NERDTree/" style="color:blue;font-size:12px;">NERDTree</a>
+        <a href="/articles/tags/bug/" style="color:blue;font-size:12px;">bug</a>
+        <a href="/articles/tags/七夕/" style="color:green;font-size:12px;">七夕</a>
+        <a href="/articles/tags/jquery/" style="color:blue;font-size:12px;">jquery</a>
+        <a href="/articles/tags/CPyUG/" style="color:red;font-size:12px;">CPyUG</a>
+        <a href="/articles/tags/龙珠/" style="color:blue;font-size:12px;">龙珠</a>
+        <a href="/articles/tags/django/" style="color:blue;font-size:12px;">django</a>
+        <a href="/articles/tags/descriptor/" style="color:blue;font-size:12px;">descriptor</a>
+        <a href="/articles/tags/悲剧/" style="color:red;font-size:12px;">悲剧</a>
+        <a href="/articles/tags/webfaction/" style="color:red;font-size:14px;">webfaction</a>
+        <a href="/articles/tags/雷/" style="color:green;font-size:12px;">雷</a>
+        <a href="/articles/tags/漫画/" style="color:blue;font-size:12px;">漫画</a>
+        <a href="/articles/tags/时间/" style="color:red;font-size:12px;">时间</a>
+        <a href="/articles/tags/nds/" style="color:blue;font-size:12px;">nds</a>
+        <a href="/articles/tags/property/" style="color:red;font-size:12px;">property</a>
+        </div>
+      </section>
+    </div>
+  </div>
+  {% endblock %}
+  </div> 
+  
+  <footer class="footer">
+    <div class="container">
+      <p class="pull-right"><a href="#">Back to top</a></p>
+      <p>Designed with Twitter bootstrap <a  target="_blank" href="http://twitter.github.com/bootstrap/">visit</a></p>
+      <p>Power by <a target="_blank" href="http://sae.sina.com.cn">Sina App Engine</a></p>
+      <ul class="footer-links">
+        <li><a href="http://python.org" target="_blank">Python</a></li>
+        <li class="muted">·</li>
+        <li><a href="http://djangoproject.com" target="_blank">Django</a></li>
+      </ul>
+    </div>
+  </footer>
+  
+  <script type="text/javascript">
+  var origin_title = document.title;
+  </script>
+  <script src="http://www.verycd.com/statics/title.saying" type="text/javascript"></script>
+  <script type="text/javascript">
+  document.getElementById('title').innerHTML = _VC_DocumentTitles[_VC_DocumentTitleIndex];
+  document.title = origin_title;
+  </script>
+<script type="text/javascript">
+function showDialog(self){
+    var dom = $(self);
+    var title = dom.attr("t");
+    var width = dom.attr("w");
+    var height = dom.attr("h");
+    var url =  dom.attr("href");
+  
+    if (height && width) {
+        $.dialog({
+            title:false,
+            id: 'adbox_window',
+            content: 'url:'+url, 
+            lock: true,
+            width:width+'px',
+            height:parseInt(height),
+            cancelVal: '取消',
+            cancel: true
+        });
+    } else {
+        $.dialog({
+            title:false,
+            id: 'adbox_window',
+            content: 'url:'+url, 
+            lock: true,
+            cancelVal: '取消',
+            cancel: true
+        });
+    }
+    return false;
+}
+</script>
+  
+  </body>
+</html>

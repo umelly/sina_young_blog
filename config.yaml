@@ -1,0 +1,6 @@
+libraries:
+- name: "django"
+  version: "1.4"
+
+name: young
+version: 1
